@@ -11,3 +11,11 @@ workflows:
     # Run the welcome/run job in its own container
     jobs:
       - welcome/run
+      - test
+jobs:
+  test:
+    # docker:
+    #   - image: circleci/<language>:<version TAG>
+    steps:
+      - checkout
+      - run: echo "test jobs"
