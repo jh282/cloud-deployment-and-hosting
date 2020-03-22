@@ -12,6 +12,9 @@ workflows:
       - terraform-validate
       - terraform-lint
       - terraform-plan
+        - requires:
+            - terraform-validate
+            - terraform-lint
 
 jobs:
   terraform-validate:
@@ -24,7 +27,7 @@ jobs:
 
   terraform-lint:
     docker:
-      - image: alpine:3.7
+      - image: centos:7
     steps:
       - checkout
       - run: yum install curl -y
