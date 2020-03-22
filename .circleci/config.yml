@@ -5,6 +5,9 @@ parameters:
   tf_dir:
     type: string
     default: "terraform/"
+  tf_plan:
+    type: string
+    default: "tf.plan"
   tf_image:
     type: string
     default: "hashicorp/terraform:light"
@@ -76,12 +79,12 @@ jobs:
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform plan << pipeline.parameters.tf_dir >> -out tf.plan
-      - run: cat tf.plan
+      - run: terraform plan -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
+      - run: cat << pipeline.parameters.tf_plan >>
       - persist_to_workspace:
           root: .
           paths:
-            - tf.plan
+            - << pipeline.parameters.tf_plan >>
 
   terraform-apply:
     docker:
@@ -90,8 +93,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform apply << pipeline.parameters.tf_dir >> -var="env=${CIRCLE_BRANCH}" -auto-approve
+      - run: terraform apply << pipeline.parameters.tf_plan >> -auto-approve
 
   terraform-destroy:
     docker:
@@ -99,4 +101,4 @@ jobs:
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform destroy << pipeline.parameters.tf_dir >> -var="env=${CIRCLE_BRANCH}" -auto-approve
+      # - run: terraform destroy << pipeline.parameters.tf_dir >> -var="env=${CIRCLE_BRANCH}" -auto-approve
