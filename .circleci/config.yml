@@ -11,11 +11,12 @@ workflows:
     # Run the welcome/run job in its own container
     jobs:
       - welcome/run
-      - test
+      - validate
 jobs:
-  test:
+  validate:
     docker:
       - image: hashicorp/terraform:light
     steps:
       - checkout
       - run: terraform -v
+      - run: terraform validate terraform/
