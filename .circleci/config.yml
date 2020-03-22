@@ -22,17 +22,17 @@ jobs:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run: ls ~/project
+      - run: ls -lRt ~/project
       - run: pwd
       - run: id
-      - run: sh << pipeline.parameters.ci_scripts_dir >>tf_validate.sh << pipeline.parameters.tf_dir >>
+      - run: << pipeline.parameters.ci_scripts_dir >>tf_validate.sh << pipeline.parameters.tf_dir >>
 
   terraform-plan:
     docker:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run: sh << pipeline.parameters.ci_scripts_dir >>tf_plan.sh << pipeline.parameters.tf_dir >>
+      - run: << pipeline.parameters.ci_scripts_dir >>tf_plan.sh << pipeline.parameters.tf_dir >>
 
   # terraform-apply:
   #   branches:
