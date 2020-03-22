@@ -1,23 +1,42 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-# Use a package of configuration called an orb.
-# orbs:
-#   # Declare a dependency on the welcome-orb
-#   welcome: circleci/welcome-orb@0.4.1
-# Orchestrate or schedule a set of jobs
+
+parameters:
+  tf_dir:
+    type: string
+    default: "terraform/"
+
 workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
+  pipeline:
     jobs:
-      # - welcome/run
-      - validate-terraform
+      - terraform-validate
+      - terraform-plan
+
 jobs:
-  validate-terraform:
+
+  terraform-validate:
     docker:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run: terraform -v
-      - run: terraform init terraform/
-      - run: terraform validate terraform/
+      - run: ./ci_scripts/tf-validate.sh << pipeline.parameters.tf_dir >>
+
+  terraform-plan:
+    requires:
+      - terraform-validate
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run: ./ci_scripts/tf_plan.sh << pipeline.parameters.tf_dir >>
+
+  # terraform-apply:
+  #   branches:
+  #     only:
+  #       - master
+  #       - develop
+  #   steps:
+  #     - checkout
+  #     - run: terraform -v
+  #     - run: terraform init terraform/
+  #     - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
