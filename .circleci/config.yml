@@ -33,11 +33,11 @@ workflows:
       - terraform-apply:
           requires:
             - terraform-apply-approval
-          filters:
-            branches:
-              only:
-                - master
-                - develop
+          # filters:
+          #   branches:
+          #     only:
+          #       - master
+          #       - develop
       - terraform-destroy-approval:
           type: approval
           requires:
@@ -80,7 +80,6 @@ jobs:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform plan -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
-      - run: cat << pipeline.parameters.tf_plan >>
       - persist_to_workspace:
           root: .
           paths:
@@ -93,7 +92,8 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: terraform apply << pipeline.parameters.tf_plan >> -auto-approve
+      - run: cat << pipeline.parameters.tf_plan >>
+      # - run: terraform apply << pipeline.parameters.tf_plan >> -auto-approve
 
   terraform-destroy:
     docker:
