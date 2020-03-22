@@ -5,6 +5,9 @@ parameters:
   tf_dir:
     type: string
     default: "terraform/"
+  ci_scripts_dir:
+    type: string
+    default: "ci_scripts/"
 
 workflows:
   pipeline:
@@ -19,14 +22,15 @@ jobs:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run: ./ci_scripts/tf-validate.sh << pipeline.parameters.tf_dir >>
+      # - run: ./ci_scripts/tf_validate.sh << pipeline.parameters.tf_dir >>
+      - run: sh << ci_scripts_dir >>tf_validate.sh << pipeline.parameters.tf_dir >>
 
   terraform-plan:
     docker:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run: ./ci_scripts/tf_plan.sh << pipeline.parameters.tf_dir >>
+      - run: sh << ci_scripts_dir >>tf_plan.sh << pipeline.parameters.tf_dir >>
 
   # terraform-apply:
   #   branches:
