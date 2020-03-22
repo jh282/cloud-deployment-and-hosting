@@ -29,7 +29,7 @@ variable "public_subnet_cidr" {
 
 variable "availability_zones" {
   type        = list(string)
-  default     = ["a","b","c"]
+  default     = ["a", "b", "c"]
   description = "List of Availability Zones (excluding region)"
 }
 
