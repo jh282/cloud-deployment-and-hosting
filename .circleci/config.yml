@@ -4,10 +4,7 @@ version: 2.1
 parameters:
   tf_dir:
     type: string
-    default: "$(pwd)/terraform/"
-  ci_scripts_dir:
-    type: string
-    default: "$(pwd)/ci_scripts/"
+    default: "/terraform/"
 
 workflows:
   pipeline:
@@ -16,23 +13,29 @@ workflows:
       - terraform-plan
 
 jobs:
-
   terraform-validate:
     docker:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run: ls -lRt ~/project
-      - run: pwd
-      - run: id
-      - run: << pipeline.parameters.ci_scripts_dir >>tf_validate.sh << pipeline.parameters.tf_dir >>
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: terraform validate << pipeline.parameters.tf_dir >>
+
+  terraform-lint:
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run: curl -L "$(curl -Ls https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" -o tflint.zip && unzip tflint.zip && rm tflint.zip
+      - run: tlfint << pipeline.parameters.tf_dir >>
 
   terraform-plan:
     docker:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run: << pipeline.parameters.ci_scripts_dir >>tf_plan.sh << pipeline.parameters.tf_dir >>
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: terraform plan << pipeline.parameters.tf_dir >>
 
   # terraform-apply:
   #   branches:
