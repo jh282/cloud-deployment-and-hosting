@@ -22,10 +22,6 @@ workflows:
       - terraform-apply:
           requires:
             - check-plan
-          branches:
-            only:
-              - master
-              - develop
 
 jobs:
 
@@ -66,3 +62,7 @@ jobs:
       - checkout
       - run: terraform init terraform/
       - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
+    branches:
+      only:
+        - master
+        - develop
