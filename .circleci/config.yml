@@ -14,11 +14,11 @@ workflows:
       - terraform-plan:
           requires:
             - terraform-validate
-            - terraform-lint          
+            - terraform-lint
       - check-plan
           type: approval
-            requires:
-              - terraform-plan
+          requires:
+            - terraform-plan
       - terraform-apply:
           requires:
             - check-plan
