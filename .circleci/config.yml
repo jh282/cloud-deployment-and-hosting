@@ -58,11 +58,11 @@ jobs:
   terraform-apply:
     docker:
       - image: hashicorp/terraform:light
-    steps:
-      - checkout
-      - run: terraform init terraform/
-      - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
     branches:
       only:
         - master
         - develop
+    steps:
+      - checkout
+      - run: terraform init terraform/
+      - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
