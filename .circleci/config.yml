@@ -10,6 +10,7 @@ workflows:
   pipeline:
     jobs:
       - terraform-validate
+      - terraform-lint
       - terraform-plan
 
 jobs:
