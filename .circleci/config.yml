@@ -7,7 +7,7 @@ parameters:
     default: "terraform/"
   tf_plan:
     type: string
-    default: "tf.plan"
+    default: "terraform.tfplan"
   tf_image:
     type: string
     default: "hashicorp/terraform:light"
@@ -92,7 +92,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: terraform apply << pipeline.parameters.tf_plan >> -auto-approve
+      - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
 
   terraform-destroy:
     docker:
@@ -100,4 +100,4 @@ jobs:
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform destroy << pipeline.parameters.tf_dir >> -auto-approve
+      - run: terraform destroy -auto-approve << pipeline.parameters.tf_dir >>
