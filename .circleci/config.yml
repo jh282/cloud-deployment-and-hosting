@@ -25,23 +25,12 @@ jobs:
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform validate << pipeline.parameters.tf_dir >>
 
-  # terraform-lint:
-  #   docker:
-  #     - image: centos:7
-  #   steps:
-  #     - checkout
-  #     - run: yum install unzip -y
-  #     - run: curl -L "$(curl -Ls https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" -o tflint.zip
-  #     - run: unzip tflint.zip
-  #     - run: ./tflint << pipeline.parameters.tf_dir >>
-
   terraform-lint:
     docker:
       - image: wata727/tflint
     steps:
       - checkout
       - run: tflint << pipeline.parameters.tf_dir >>
-
 
   terraform-plan:
     docker:
