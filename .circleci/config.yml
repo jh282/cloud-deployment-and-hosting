@@ -4,10 +4,10 @@ version: 2.1
 parameters:
   tf_dir:
     type: string
-    default: "terraform/"
+    default: "${CIRCLE_WORKING_DIRECTORY}terraform/"
   ci_scripts_dir:
     type: string
-    default: "ci_scripts/"
+    default: "${CIRCLE_WORKING_DIRECTORY}ci_scripts/"
 
 workflows:
   pipeline:
