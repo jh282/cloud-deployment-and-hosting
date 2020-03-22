@@ -4,10 +4,10 @@ version: 2.1
 parameters:
   tf_dir:
     type: string
-    default: "${CIRCLE_WORKING_DIRECTORY}terraform/"
+    default: "${CIRCLE_WORKING_DIRECTORY}/terraform/"
   ci_scripts_dir:
     type: string
-    default: "${CIRCLE_WORKING_DIRECTORY}ci_scripts/"
+    default: "${CIRCLE_WORKING_DIRECTORY}/ci_scripts/"
 
 workflows:
   pipeline:
@@ -22,7 +22,6 @@ jobs:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      # - run: ./ci_scripts/tf_validate.sh << pipeline.parameters.tf_dir >>
       - run: sh << pipeline.parameters.ci_scripts_dir >>tf_validate.sh << pipeline.parameters.tf_dir >>
 
   terraform-plan:
