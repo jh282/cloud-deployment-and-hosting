@@ -22,7 +22,9 @@ jobs:
       - image: hashicorp/terraform:light
     steps:
       - checkout
+      - run: ls
       - run: pwd
+      - run: id
       - run: sh << pipeline.parameters.ci_scripts_dir >>tf_validate.sh << pipeline.parameters.tf_dir >>
 
   terraform-plan:
