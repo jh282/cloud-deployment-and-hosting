@@ -76,7 +76,8 @@ jobs:
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform plan << pipeline.parameters.tf_dir >> -o tf.plan
+      - run: terraform plan << pipeline.parameters.tf_dir >> -out tf.plan
+      - run: cat tf.plan
       - persist_to_workspace:
           root: .
           paths:
