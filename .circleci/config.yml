@@ -5,6 +5,9 @@ parameters:
   tf_dir:
     type: string
     default: "terraform/"
+  tf_image:
+    type: string
+    default: "hashicorp/terraform:light"
 
 workflows:
   pipeline:
@@ -15,13 +18,35 @@ workflows:
           requires:
             - terraform-validate
             - terraform-lint
-      - check-plan:
+      - terraform-apply-approval:
           type: approval
           requires:
             - terraform-plan
+          filters:
+            branches:
+              only:
+                - master
+                - develop
       - terraform-apply:
           requires:
-            - check-plan
+            - terraform-apply-approval
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - terraform-destroy-approval:
+          type: approval
+          requires:
+            - terraform-apply
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - terraform-destroy:
+          requires:
+            - terraform-destroy-approval
           filters:
             branches:
               only:
@@ -32,7 +57,7 @@ jobs:
 
   terraform-validate:
     docker:
-      - image: hashicorp/terraform:light
+      - image: << pipeline.parameters.tf_image >>
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
@@ -47,23 +72,30 @@ jobs:
 
   terraform-plan:
     docker:
-      - image: hashicorp/terraform:light
+      - image: << pipeline.parameters.tf_image >>
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform plan << pipeline.parameters.tf_dir >>
-
-  check-plan:
-    docker:
-      - image: hashicorp/terraform:light
-    steps:
-      - checkout
-      - run: echo "Check plan !"
+      - run: terraform plan << pipeline.parameters.tf_dir >> -o tf.plan
+      - persist_to_workspace:
+          root: .
+          paths:
+            - tf.plan
 
   terraform-apply:
     docker:
-      - image: hashicorp/terraform:light
+      - image: << pipeline.parameters.tf_image >>
     steps:
       - checkout
-      - run: terraform init terraform/
-      - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
+      - attach_workspace:
+          at: .
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: terraform apply << pipeline.parameters.tf_dir >> -var="env=${CIRCLE_BRANCH}" -auto-approve
+
+  terraform-destroy:
+    docker:
+      - image: << pipeline.parameters.tf_image >>
+    steps:
+      - checkout
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: terraform destroy << pipeline.parameters.tf_dir >> -var="env=${CIRCLE_BRANCH}" -auto-approve
