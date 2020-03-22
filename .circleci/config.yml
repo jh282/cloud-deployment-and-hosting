@@ -92,6 +92,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
+      - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
 
   terraform-destroy:
