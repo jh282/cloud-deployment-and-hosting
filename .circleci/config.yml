@@ -1,21 +1,103 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-# Use a package of configuration called an orb.
-orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
-# Orchestrate or schedule a set of jobs
+
+parameters:
+  tf_dir:
+    type: string
+    default: "terraform/"
+  tf_plan:
+    type: string
+    default: "tf.plan"
+  tf_image:
+    type: string
+    default: "hashicorp/terraform:light"
+
 workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
+  pipeline:
     jobs:
-      - welcome/run
-      - test
+      - terraform-validate
+      - terraform-lint
+      - terraform-plan:
+          requires:
+            - terraform-validate
+            - terraform-lint
+      - terraform-apply-approval:
+          type: approval
+          requires:
+            - terraform-plan
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - terraform-apply:
+          requires:
+            - terraform-apply-approval
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - terraform-destroy-approval:
+          type: approval
+          requires:
+            - terraform-apply
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - terraform-destroy:
+          requires:
+            - terraform-destroy-approval
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+
 jobs:
-  test:
+
+  terraform-validate:
     docker:
-      - image: hashicorp/terraform:light
+      - image: << pipeline.parameters.tf_image >>
     steps:
       - checkout
-      - run: terraform -v
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: terraform validate << pipeline.parameters.tf_dir >>
+
+  terraform-lint:
+    docker:
+      - image: wata727/tflint
+    steps:
+      - checkout
+      - run: tflint << pipeline.parameters.tf_dir >>
+
+  terraform-plan:
+    docker:
+      - image: << pipeline.parameters.tf_image >>
+    steps:
+      - checkout
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: terraform plan -var="env=${CIRCLE_BRANCH}" -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
+      - persist_to_workspace:
+          root: .
+          paths:
+            - << pipeline.parameters.tf_plan >>
+
+  terraform-apply:
+    docker:
+      - image: << pipeline.parameters.tf_image >>
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: terraform apply << pipeline.parameters.tf_plan >> -auto-approve
+
+  terraform-destroy:
+    docker:
+      - image: << pipeline.parameters.tf_image >>
+    steps:
+      - checkout
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: terraform destroy << pipeline.parameters.tf_dir >> -auto-approve
