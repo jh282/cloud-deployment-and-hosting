@@ -22,6 +22,7 @@ jobs:
       - image: hashicorp/terraform:light
     steps:
       - checkout
+      - run: pwd
       - run: sh << pipeline.parameters.ci_scripts_dir >>tf_validate.sh << pipeline.parameters.tf_dir >>
 
   terraform-plan:
@@ -31,13 +32,13 @@ jobs:
       - checkout
       - run: sh << pipeline.parameters.ci_scripts_dir >>tf_plan.sh << pipeline.parameters.tf_dir >>
 
-  # terraform-apply:
-  #   branches:
-  #     only:
-  #       - master
-  #       - develop
-  #   steps:
-  #     - checkout
-  #     - run: terraform -v
-  #     - run: terraform init terraform/
-  #     - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
+  terraform-apply:
+    branches:
+      only:
+        - master
+        - develop
+    steps:
+      - checkout
+      - run: terraform -v
+      - run: terraform init terraform/
+      - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
