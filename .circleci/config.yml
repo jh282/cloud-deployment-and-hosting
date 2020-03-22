@@ -25,11 +25,11 @@ workflows:
           type: approval
           requires:
             - terraform-plan
-          filters:
-            branches:
-              only:
-                - master
-                - develop
+          # filters:
+          #   branches:
+          #     only:
+          #       - master
+          #       - develop
       - terraform-apply:
           requires:
             - terraform-apply-approval
