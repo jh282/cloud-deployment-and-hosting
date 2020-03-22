@@ -22,8 +22,6 @@ jobs:
       - run: ./ci_scripts/tf-validate.sh << pipeline.parameters.tf_dir >>
 
   terraform-plan:
-    requires:
-      - terraform-validate
     docker:
       - image: hashicorp/terraform:light
     steps:
