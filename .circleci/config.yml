@@ -25,19 +25,19 @@ workflows:
           type: approval
           requires:
             - terraform-plan
-          # filters:
-          #   branches:
-          #     only:
-          #       - master
-          #       - develop
+          filters:
+            branches:
+              only:
+                - master
+                - develop
       - terraform-apply:
           requires:
             - terraform-apply-approval
-          # filters:
-          #   branches:
-          #     only:
-          #       - master
-          #       - develop
+          filters:
+            branches:
+              only:
+                - master
+                - develop
       - terraform-destroy-approval:
           type: approval
           requires:
@@ -79,7 +79,7 @@ jobs:
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform plan -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
+      - run: terraform plan -var="env=${CIRCLE_BRANCH}" -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
       - persist_to_workspace:
           root: .
           paths:
@@ -92,8 +92,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: cat << pipeline.parameters.tf_plan >>
-      # - run: terraform apply << pipeline.parameters.tf_plan >> -auto-approve
+      - run: terraform apply << pipeline.parameters.tf_plan >> -auto-approve
 
   terraform-destroy:
     docker:
@@ -101,4 +100,4 @@ jobs:
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      # - run: terraform destroy << pipeline.parameters.tf_dir >> -var="env=${CIRCLE_BRANCH}" -auto-approve
+      - run: terraform destroy << pipeline.parameters.tf_dir >> -auto-approve
