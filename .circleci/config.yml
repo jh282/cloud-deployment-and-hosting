@@ -14,9 +14,21 @@ workflows:
       - terraform-plan:
           requires:
             - terraform-validate
-            - terraform-lint
+            - terraform-lint          
+      - check-plan
+          type: approval
+            requires:
+              - terraform-plan
+      - terraform-apply:
+          requires:
+            - check-plan
+          branches:
+            only:
+              - master
+              - develop
 
 jobs:
+
   terraform-validate:
     docker:
       - image: hashicorp/terraform:light
@@ -40,13 +52,17 @@ jobs:
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform plan << pipeline.parameters.tf_dir >>
 
-  # terraform-apply:
-  #   branches:
-  #     only:
-  #       - master
-  #       - develop
-  #   steps:
-  #     - checkout
-  #     - run: terraform -v
-  #     - run: terraform init terraform/
-  #     - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
+  check-plan:
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run: echo "Check plan !"
+
+  terraform-apply:
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run: terraform init terraform/
+      - run: terraform plan terraform/ -var="build=${CIRCLE_BRANCH}"
