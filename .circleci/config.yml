@@ -22,6 +22,11 @@ workflows:
       - terraform-apply:
           requires:
             - check-plan
+          filters:
+            branches:
+              only:
+                - master
+                - develop
 
 jobs:
 
@@ -58,10 +63,6 @@ jobs:
   terraform-apply:
     docker:
       - image: hashicorp/terraform:light
-    branches:
-      only:
-        - master
-        - develop
     steps:
       - checkout
       - run: terraform init terraform/
