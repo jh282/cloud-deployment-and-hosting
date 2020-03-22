@@ -12,9 +12,6 @@ workflows:
       - terraform-validate
       - terraform-lint
       - terraform-plan
-        requires:
-          - terraform-validate
-          - terraform-lint
 
 jobs:
   terraform-validate:
