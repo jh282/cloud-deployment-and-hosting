@@ -40,7 +40,7 @@ module "asg" {
   tags = [
   {
     key                 = "Environment"
-    value               = local.env
+    value               = var.env
     propagate_at_launch = true
   },
   {
