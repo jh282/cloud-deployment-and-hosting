@@ -38,17 +38,17 @@ module "asg" {
   wait_for_capacity_timeout = 0
 
   tags = [
-  {
-    key                 = "Environment"
-    value               = var.env
-    propagate_at_launch = true
-  },
-  {
-    key                 = "Cluster"
-    value               = var.name
-    propagate_at_launch = true
-  },
-]
+    {
+      key                 = "Environment"
+      value               = var.env
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Cluster"
+      value               = var.name
+      propagate_at_launch = true
+    }
+  ]
 }
 
 module "ecs" {
