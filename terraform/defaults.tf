@@ -1,3 +1,8 @@
+variable "env" {
+  type        = string
+  description = "Environment to build services in. (CI will pass in branch name)"
+}
+
 variable "region" {
   type        = string
   default     = "eu-west-2"
@@ -31,6 +36,12 @@ variable "availability_zones" {
   type        = list(string)
   default     = ["a", "b", "c"]
   description = "List of Availability Zones (excluding region)"
+}
+
+variable "instance_type" {
+  type        = string
+  default     = "t2.micro"
+  description = "Default instance size for ecs instances"
 }
 
 variable "enable_nat_gateway" {

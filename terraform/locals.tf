@@ -1,7 +1,11 @@
 locals {
+  az_list = [
+      for az in var.availability_zones:
+      "${var.region}${az}"
+    ]
+
   common_tags = {
+    name      = var.name
     Terraform = "true"
   }
-
-  az_list = ["${var.region}${var.availability_zones[0]}", "${var.region}${var.availability_zones[1]}", "${var.region}${var.availability_zones[2]}"]
 }
