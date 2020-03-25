@@ -44,16 +44,6 @@ variable "instance_type" {
   description = "Default instance size for ecs instances"
 }
 
-variable "enable_nat_gateway" {
-  type    = string
-  default = false
-}
-
-variable "enable_vpn_gateway" {
-  type    = string
-  default = false
-}
-
 variable "remote_state_bucket" {
   type    = string
   default = "terraform-remote-state-cdah"
