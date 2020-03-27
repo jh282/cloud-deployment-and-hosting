@@ -94,7 +94,6 @@ jobs:
           at: .
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
-      - run: echo "Website - $(terraform output alb_public_address)"
 
   terraform-destroy:
     docker:
