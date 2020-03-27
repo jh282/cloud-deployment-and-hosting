@@ -38,6 +38,14 @@ workflows:
               only:
                 - master
                 - develop
+      - output-address:
+          requires:
+            - terraform-apply
+          filters:
+            branches:
+              only:
+                - master
+                - develop
       - terraform-destroy-approval:
           type: approval
           requires:
@@ -94,7 +102,14 @@ jobs:
           at: .
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
-      - run: Website link: $(terraform output alb_public_address)
+
+    output-address:
+      docker:
+        - image: << pipeline.parameters.tf_image >>
+      steps:
+        - checkout
+        - run: terraform init << pipeline.parameters.tf_dir >>
+        - run: echo "Website: $(terraform output alb_public_address)"
 
   terraform-destroy:
     docker:
