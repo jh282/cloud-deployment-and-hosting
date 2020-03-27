@@ -109,7 +109,7 @@ jobs:
       steps:
         - checkout
         - run: terraform init << pipeline.parameters.tf_dir >>
-        - run: echo "Website: $(terraform output alb_public_address)"
+        - run: echo "Website - $(terraform output alb_public_address)"
 
   terraform-destroy:
     docker:
