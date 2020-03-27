@@ -103,13 +103,13 @@ jobs:
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
 
-    output-address:
-      docker:
-        - image: << pipeline.parameters.tf_image >>
-      steps:
-        - checkout
-        - run: terraform init << pipeline.parameters.tf_dir >>
-        - run: echo "Website - $(terraform output alb_public_address)"
+  output-address:
+    docker:
+      - image: << pipeline.parameters.tf_image >>
+    steps:
+      - checkout
+      - run: terraform init << pipeline.parameters.tf_dir >>
+      - run: echo "Website - $(terraform output alb_public_address)"
 
   terraform-destroy:
     docker:
