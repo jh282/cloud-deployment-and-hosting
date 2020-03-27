@@ -1,8 +1,3 @@
-variable "env" {
-  type        = string
-  description = "Environment to build services in. (CI will pass in branch name)"
-}
-
 variable "region" {
   type        = string
   default     = "eu-west-2"
@@ -44,22 +39,14 @@ variable "instance_type" {
   description = "Default instance size for ecs instances"
 }
 
-variable "enable_nat_gateway" {
-  type    = string
-  default = false
+variable "container_port" {
+  type        = number
+  default     = 80
+  description = "Port container will listen on"
 }
 
-variable "enable_vpn_gateway" {
-  type    = string
-  default = false
-}
-
-variable "remote_state_bucket" {
-  type    = string
-  default = "terraform-remote-state-cdah"
-}
-
-variable "remote_state_table" {
-  type    = string
-  default = "terraform-state-locks"
+variable "container_protocol" {
+  type        = string
+  default     = "HTTP"
+  description = "Port container will listen on"
 }
