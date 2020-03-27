@@ -8,7 +8,9 @@ module "vpc" {
   private_subnets = var.private_subnet_cidr
   public_subnets  = var.public_subnet_cidr
 
-  enable_nat_gateway = false
+  map_public_ip_on_launch = false
+
+  enable_nat_gateway = true
   enable_vpn_gateway = false
 
   tags = local.common_tags
@@ -24,24 +26,24 @@ module "asg" {
   lc_name = var.name
 
   image_id             = data.aws_ami.amazon_linux_ecs.id
-  instance_type        = "t2.micro"
-  security_groups      = [module.vpc.default_security_group_id]
-  iam_instance_profile = module.ec2-profile.this_iam_instance_profile_id
+  instance_type        = var.instance_type
+  security_groups      = [aws_security_group.ec2.id]
+  iam_instance_profile = module.ec2_profile.this_iam_instance_profile_id
   user_data            = data.template_file.user_data.rendered
 
   # Auto scaling group
   asg_name                  = var.name
   vpc_zone_identifier       = module.vpc.private_subnets
   health_check_type         = "EC2"
-  min_size                  = 0
-  max_size                  = 1
+  min_size                  = 1
+  max_size                  = 3
   desired_capacity          = 1
   wait_for_capacity_timeout = 0
 
   tags = [
     {
       key                 = "Environment"
-      value               = var.env
+      value               = var.name
       propagate_at_launch = true
     },
     {
@@ -52,12 +54,27 @@ module "asg" {
   ]
 }
 
-module "ecs" {
-  source = "terraform-aws-modules/ecs/aws"
-  name   = var.name
+resource "aws_security_group" "ec2" {
+  name   = "${var.name}-ec2"
+  vpc_id = module.vpc.vpc_id
+
+  ingress {
+    description = "Inbound from ALB"
+    from_port   = 1024
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = module.vpc.public_subnets_cidr_blocks
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-module "ec2-profile" {
+module "ec2_profile" {
   source = "./modules/ecs-instance-profile"
   name   = var.name
 }

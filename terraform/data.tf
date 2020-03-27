@@ -16,8 +16,8 @@ data "aws_ami" "amazon_linux_ecs" {
 
 data "template_file" "user_data" {
   template = file("${path.module}/templates/user-data.sh")
+}
 
-  vars = {
-    cluster_name = var.name
-  }
+data "template_file" "container_definition" {
+  template = file("${path.module}/templates/container_definition.json")
 }

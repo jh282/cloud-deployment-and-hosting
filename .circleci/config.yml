@@ -79,7 +79,7 @@ jobs:
     steps:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
-      - run: terraform plan -var="env=${CIRCLE_BRANCH}" -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
+      - run: terraform plan -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
       - persist_to_workspace:
           root: .
           paths:
@@ -94,6 +94,7 @@ jobs:
           at: .
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
+      - run: Website link: $(terraform output alb_public_address)
 
   terraform-destroy:
     docker:
