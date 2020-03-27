@@ -7,12 +7,12 @@
        "sh",
        "-c"
     ],
-    "name": "cdah",
+    "name": "${name}",
     "image": "httpd:2.4",
     "essential": true,
     "portMappings": [
       {
-        "containerPort": 80,
+        "containerPort": ${container_port},
         "hostPort": 0
       }
     ],

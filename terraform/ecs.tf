@@ -14,7 +14,7 @@ resource "aws_ecs_service" "cdah" {
   load_balancer {
     target_group_arn = module.alb.target_group_arns[0]
     container_name   = var.name
-    container_port   = 80
+    container_port   = var.container_port
   }
 }
 
@@ -26,21 +26,7 @@ resource "aws_ecs_task_definition" "cdah" {
 resource "aws_iam_role" "ecs_service" {
   name = "${var.name}-ecs-role"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
-	{
-	  "Sid": "",
-	  "Effect": "Allow",
-	  "Principal": {
-		"Service": "ecs.amazonaws.com"
-	  },
-	  "Action": "sts:AssumeRole"
-	}
-  ]
-}
-EOF
+  assume_role_policy = data.template_file.ecs_assume_role_policy.rendered
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_service" {

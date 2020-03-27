@@ -1,6 +1,4 @@
 locals {
-  domain = "${var.name}.com"
-
   az_list = [
     for az in var.availability_zones :
     "${var.region}${az}"

@@ -1,21 +1,3 @@
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "~> v2.0"
-
-  name            = var.name
-  cidr            = var.vpc_cidr
-  azs             = local.az_list
-  private_subnets = var.private_subnet_cidr
-  public_subnets  = var.public_subnet_cidr
-
-  map_public_ip_on_launch = false
-
-  enable_nat_gateway = true
-  enable_vpn_gateway = false
-
-  tags = local.common_tags
-}
-
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 3.0"
@@ -27,8 +9,8 @@ module "asg" {
 
   image_id             = data.aws_ami.amazon_linux_ecs.id
   instance_type        = var.instance_type
-  security_groups      = [aws_security_group.ec2.id]
-  iam_instance_profile = module.ec2_profile.this_iam_instance_profile_id
+  security_groups      = [aws_security_group.ecs_ec2.id]
+  iam_instance_profile = aws_iam_instance_profile.ecs_ec2.id
   user_data            = data.template_file.user_data.rendered
 
   # Auto scaling group
@@ -54,7 +36,7 @@ module "asg" {
   ]
 }
 
-resource "aws_security_group" "ec2" {
+resource "aws_security_group" "ecs_ec2" {
   name   = "${var.name}-ec2"
   vpc_id = module.vpc.vpc_id
 
@@ -63,7 +45,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 1024
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = module.vpc.public_subnets_cidr_blocks
+    security_groups = [aws_security_group.alb_sg.id]
   }
 
   egress {
@@ -74,7 +56,24 @@ resource "aws_security_group" "ec2" {
   }
 }
 
-module "ec2_profile" {
-  source = "./modules/ecs-instance-profile"
-  name   = var.name
+resource "aws_iam_role" "ecs_ec2" {
+  name = "${var.name}_ecs_instance_role"
+  path = "/ecs/"
+
+  assume_role_policy = data.template_file.ec2_assume_role_policy.rendered
+}
+
+resource "aws_iam_instance_profile" "ecs_ec2" {
+  name = "${var.name}_ecs_instance_profile"
+  role = aws_iam_role.ecs_ec2.name
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ec2_container" {
+  role = aws_iam_role.ecs_ec2.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ec2_cloudwatch" {
+  role = aws_iam_role.ecs_ec2.id
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }

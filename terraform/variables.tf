@@ -39,12 +39,14 @@ variable "instance_type" {
   description = "Default instance size for ecs instances"
 }
 
-variable "remote_state_bucket" {
-  type    = string
-  default = "terraform-remote-state-cdah"
+variable "container_port" {
+  type        = number
+  default     = 80
+  description = "Port container will listen on"
 }
 
-variable "remote_state_table" {
-  type    = string
-  default = "terraform-state-locks"
+variable "container_protocol" {
+  type        = string
+  default     = "HTTP"
+  description = "Port container will listen on"
 }

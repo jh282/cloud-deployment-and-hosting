@@ -1,7 +1,3 @@
-output "alb_public_address" {
-  value = "${module.alb.this_lb_dns_name}"
-}
-
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 5.0"
@@ -16,17 +12,17 @@ module "alb" {
 
   http_tcp_listeners = [
     {
-      port               = 80
-      protocol           = "HTTP"
+      port               = var.container_port
+      protocol           = var.container_protocol
       target_group_index = 0
     }
   ]
 
   target_groups = [
     {
-      name_prefix      = "cdah"
-      backend_protocol = "HTTP"
-      backend_port     = 80
+      name_prefix      = var.name
+      backend_protocol = var.container_protocol
+      backend_port     = var.container_port
       target_type      = "instance"
     }
   ]
