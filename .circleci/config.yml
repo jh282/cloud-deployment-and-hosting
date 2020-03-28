@@ -93,6 +93,21 @@ jobs:
           at: .
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
+      - run: terraform output >> ./ecr_repo.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./ecr_repo.txt
+
+  image-upload:
+    docker:
+      - image: docker:19.03.8
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: docker build . --tag $(cat ./ecr_repo.txt)
+      - run: docker push $(cat ./ecr_repo.txt)
 
   terraform-destroy:
     docker:
