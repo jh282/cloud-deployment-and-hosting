@@ -20,7 +20,7 @@ workflows:
           requires:
             - terraform-validate
             - terraform-lint
-      - terraform-apply-approval:
+      - deplyoment-approval:
           type: approval
           requires:
             - terraform-plan
@@ -31,14 +31,13 @@ workflows:
                 - develop
       - terraform-apply:
           requires:
-            - terraform-apply-approval
+            - deplyoment-approval
           filters:
             branches:
               only:
                 - master
                 - develop
-      - terraform-destroy-approval:
-          type: approval
+      - image-upload:
           requires:
             - terraform-apply
           filters:
@@ -46,9 +45,18 @@ workflows:
               only:
                 - master
                 - develop
+      - teardown-approval:
+          type: approval
+          requires:
+            - image-upload
+          filters:
+            branches:
+              only:
+                - master
+                - develop
       - terraform-destroy:
           requires:
-            - terraform-destroy-approval
+            - teardown-approval
           filters:
             branches:
               only:
@@ -93,7 +101,8 @@ jobs:
           at: .
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
-      - run: terraform output >> ./ecr_repo.txt
+      - run: cd << pipeline.parameters.tf_dir >>
+      - run: terraform output ecr_repo >> ./ecr_repo.txt
       - persist_to_workspace:
           root: .
           paths:
