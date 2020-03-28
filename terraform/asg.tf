@@ -41,10 +41,10 @@ resource "aws_security_group" "ecs_ec2" {
   vpc_id = module.vpc.vpc_id
 
   ingress {
-    description = "Inbound from ALB"
-    from_port   = 1024
-    to_port     = 65535
-    protocol    = "tcp"
+    description     = "Inbound from ALB"
+    from_port       = 1024
+    to_port         = 65535
+    protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
 
@@ -69,11 +69,11 @@ resource "aws_iam_instance_profile" "ecs_ec2" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_ec2_container" {
-  role = aws_iam_role.ecs_ec2.id
+  role       = aws_iam_role.ecs_ec2.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_ec2_cloudwatch" {
-  role = aws_iam_role.ecs_ec2.id
+  role       = aws_iam_role.ecs_ec2.id
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
