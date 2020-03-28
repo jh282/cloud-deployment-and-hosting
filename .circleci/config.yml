@@ -20,7 +20,7 @@ workflows:
           requires:
             - terraform-validate
             - terraform-lint
-      - deplyoment-approval:
+      - deplyoment-approval-req:
           type: approval
           requires:
             - terraform-plan
@@ -31,16 +31,16 @@ workflows:
                 - develop
       - terraform-apply:
           requires:
-            - deplyoment-approval
+            - deplyoment-approval-req
           filters:
             branches:
               only:
                 - master
                 - develop
-      - teardown-approval:
+      - teardown-approval-req:
           type: approval
           requires:
-            - image-upload
+            - terraform-apply
           filters:
             branches:
               only:
@@ -48,7 +48,7 @@ workflows:
                 - develop
       - terraform-destroy:
           requires:
-            - teardown-approval
+            - teardown-approval-req
           filters:
             branches:
               only:
