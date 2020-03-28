@@ -101,8 +101,7 @@ jobs:
           at: .
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform apply -auto-approve << pipeline.parameters.tf_plan >>
-      - run: cd << pipeline.parameters.tf_dir >>
-      - run: terraform output ecr_repo >> ./ecr_repo.txt
+      - run: cd << pipeline.parameters.tf_dir >>; terraform init; terraform output ecr_url >> ./ecr_url.txt
       - persist_to_workspace:
           root: .
           paths:
