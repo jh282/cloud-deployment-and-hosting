@@ -105,7 +105,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./ecr_repo.txt
+            - ./ecr_url.txt
 
   image-upload:
     docker:
@@ -114,8 +114,8 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: docker build . --tag $(cat ./ecr_repo.txt)
-      - run: docker push $(cat ./ecr_repo.txt)
+      - run: docker build . --tag $(cat ./ecr_url.txt)
+      - run: docker push $(cat ./ecr_url.txt)
 
   terraform-destroy:
     docker:

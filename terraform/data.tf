@@ -46,3 +46,7 @@ data "template_file" "ec2_assume_role_policy" {
     role = "ec2"
   }
 }
+
+data "aws_ecr_repository" "cdah" {
+  name = var.name
+}

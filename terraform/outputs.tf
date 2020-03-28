@@ -3,5 +3,5 @@ output "website_address" {
 }
 
 output "ecr_url" {
-  value = aws_ecr_repository.cdah.repository_url
+  value = data.aws_ecr_repository.cdah.repository_url
 }
