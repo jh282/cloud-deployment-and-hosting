@@ -8,7 +8,7 @@
        "-c"
     ],
     "name": "${name}",
-    "image": "httpd:2.4",
+    "image": "${image}:latest",
     "essential": true,
     "portMappings": [
       {

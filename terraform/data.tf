@@ -28,6 +28,7 @@ data "template_file" "container_definition" {
   vars = {
     name           = var.name
     container_port = var.container_port
+    image          = data.aws_ecr_repository.cdah.repository_url
   }
 }
 
