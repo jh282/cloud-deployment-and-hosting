@@ -2,9 +2,9 @@
 
 ## Solution
 
-This creates an AWS with EC2 backed ECS Cluster in a VPC spread across 3 availability zones in a single region. It pulls an image from ECR (which I stored my website build in) and serves on HTTP. Access to the site is possible by hitting the public DNS of the ALB, which routes the traffic to ECS using dynamic port mapping.
+This creates an ECS Cluster on a EC2-ASG in a VPC spread across 3 availability zones in a single region adding resiliency. It pulls an image from ECR (which I pushed my website build to) and serves it on HTTP. Access to the site is possible by hitting the public DNS of the ALB, which routes the traffic to ECS using dynamic port mapping.
 
-Metrics are exported from the ECS Service to cloudwatch, from which alarms can trigger autoscaling of the container capacity.
+Metrics are exported from the ECS Service to cloudwatch, from which alarms can trigger autoscaling of the container capacity. This is currently just looking at CPU to prove the concept, so would need improving with more meaningful metrics and values to get the benefit from it going forward.
 
 The infrastructure is managed by Terraform and can be scaled up easily by altering the ec2 and ecs capacity variables in variables.tf, which will scale the size of the ECS service as well as the EC2 ASG it resides on.
 
