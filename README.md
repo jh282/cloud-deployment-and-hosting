@@ -8,7 +8,7 @@ Metrics are exported from the ECS Service to cloudwatch, from which alarms can t
 
 The infrastructure is managed by Terraform and can be scaled up easily by altering the ec2 and ecs capacity variables in variables.tf, which will scale the size of the ECS service as well as the EC2 ASG it resides on.
 
-![alt text](https://raw.githubusercontent.com/jh282/cloud-deployment-and-hosting/master/cloud_deployment_aws.png "Infrastructure Diagram")
+![alt text](https://raw.githubusercontent.com/jh282/cloud-deployment-and-hosting/develop/cloud_deployment_aws.png "Infrastructure Diagram")
 
 ## Automation
 
