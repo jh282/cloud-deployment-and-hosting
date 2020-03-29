@@ -1,3 +1,5 @@
+# Standard VPC creation
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> v2.0"

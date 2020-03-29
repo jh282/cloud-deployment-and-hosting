@@ -1,18 +1,20 @@
+variable "name" {
+  type    = string
+  default = "cdah"
+}
+
 variable "region" {
   type        = string
   default     = "eu-west-2"
   description = "Default region for AWS resources"
 }
 
-variable "name" {
-  type    = string
-  default = "cdah"
-}
+# VPC Variables
 
 variable "vpc_cidr" {
   type        = string
   default     = "10.0.0.0/16"
-  description = "CIDR block for the VPC resource"
+  description = "CIDR block for the VPC"
 }
 
 variable "private_subnet_cidr" {
@@ -33,11 +35,33 @@ variable "availability_zones" {
   description = "List of Availability Zones (excluding region)"
 }
 
+# ASG Variables
+
+variable "min_ec2_capacity" {
+  type        = number
+  default     = 1
+  description = "Minimum number of EC2 instances to run in ASG"
+}
+
+variable "max_ec2_capacity" {
+  type        = number
+  default     = 3
+  description = "Maximum number of EC2 instances to run in ASG"
+}
+
+variable "desired_ec2_capacity" {
+  type        = number
+  default     = 1
+  description = "Desired number of EC2 instances to run in ASG"
+}
+
 variable "instance_type" {
   type        = string
   default     = "t2.micro"
   description = "Default instance size for ecs instances"
 }
+
+# ECS Variables
 
 variable "container_port" {
   type        = number
@@ -48,5 +72,23 @@ variable "container_port" {
 variable "container_protocol" {
   type        = string
   default     = "HTTP"
-  description = "Port container will listen on"
+  description = "Protocol the container will listen on"
+}
+
+variable "min_ecs_capacity" {
+  type        = number
+  default     = 1
+  description = "Minimum number of containers to run in ECS service"
+}
+
+variable "max_ecs_capacity" {
+  type        = number
+  default     = 15
+  description = "Maximum number of containers to run in ECS service"
+}
+
+variable "desired_ecs_capacity" {
+  type        = number
+  default     = 1
+  description = "Desired number of containers to run in ECS service"
 }

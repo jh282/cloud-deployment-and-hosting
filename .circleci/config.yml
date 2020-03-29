@@ -24,36 +24,16 @@ workflows:
           type: approval
           requires:
             - terraform-plan
-          filters:
-            branches:
-              only:
-                - master
-                - develop
       - terraform-apply:
           requires:
             - deplyoment-approval-req
-          filters:
-            branches:
-              only:
-                - master
-                - develop
       - teardown-approval-req:
           type: approval
           requires:
             - terraform-apply
-          filters:
-            branches:
-              only:
-                - master
-                - develop
       - terraform-destroy:
           requires:
             - teardown-approval-req
-          filters:
-            branches:
-              only:
-                - master
-                - develop
 
 jobs:
 

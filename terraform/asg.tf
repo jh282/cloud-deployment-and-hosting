@@ -1,12 +1,13 @@
+## ASG for ECS EC2 Instances
+
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 3.0"
 
   name = var.name
 
-  # Launch configuration
-  lc_name = var.name
-
+  # Launch config
+  lc_name              = var.name
   image_id             = data.aws_ami.amazon_linux_ecs.id
   instance_type        = var.instance_type
   security_groups      = [aws_security_group.ecs_ec2.id]
@@ -17,9 +18,9 @@ module "asg" {
   asg_name                  = var.name
   vpc_zone_identifier       = module.vpc.private_subnets
   health_check_type         = "EC2"
-  min_size                  = 1
-  max_size                  = 3
-  desired_capacity          = 1
+  min_size                  = var.min_ec2_capacity
+  max_size                  = var.max_ec2_capacity
+  desired_capacity          = var.desired_ec2_capacity
   wait_for_capacity_timeout = 0
 
   tags = [
@@ -36,35 +37,40 @@ module "asg" {
   ]
 }
 
+## ECS EC2 Security Group
+
 resource "aws_security_group" "ecs_ec2" {
-  name   = "${var.name}-ec2"
+  name   = "${var.name}_ec2"
   vpc_id = module.vpc.vpc_id
 
   ingress {
-    description     = "Inbound from ALB"
+    description     = "Inbound from ALB SG"
     from_port       = 1024
     to_port         = 65535
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    security_groups = [aws_security_group.alb.id]
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "To AWS API"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
+## ECS EC2 IAM
+
 resource "aws_iam_role" "ecs_ec2" {
-  name = "${var.name}_ecs_instance_role"
+  name = "${var.name}-ecs-instance-role"
   path = "/ecs/"
 
   assume_role_policy = data.template_file.ec2_assume_role_policy.rendered
 }
 
 resource "aws_iam_instance_profile" "ecs_ec2" {
-  name = "${var.name}_ecs_instance_profile"
+  name = "${var.name}-ecs-instance-profile"
   role = aws_iam_role.ecs_ec2.name
 }
 

@@ -1,3 +1,5 @@
+## ALB in public subnet, listening for HTTP requests
+
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 5.0"
@@ -8,7 +10,7 @@ module "alb" {
 
   subnets         = module.vpc.public_subnets
   vpc_id          = module.vpc.vpc_id
-  security_groups = [aws_security_group.alb_sg.id]
+  security_groups = [aws_security_group.alb.id]
 
   http_tcp_listeners = [
     {
@@ -30,7 +32,9 @@ module "alb" {
   tags = local.common_tags
 }
 
-resource "aws_security_group" "alb_sg" {
+## ALB Security Group
+
+resource "aws_security_group" "alb" {
   name   = "${var.name}-alb"
   vpc_id = module.vpc.vpc_id
 
@@ -41,12 +45,16 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
 
-  egress {
-    description = "To backend ECS"
-    from_port   = 1024
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = module.vpc.private_subnets_cidr_blocks
-  }
+# Limit egress only to ECS EC2 Security Group
+
+resource "aws_security_group_rule" "to_ecs" {
+  description              = "To backend ECS"
+  type                     = "egress"
+  from_port                = 1024
+  to_port                  = 65535
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ecs_ec2.id
+  security_group_id        = aws_security_group.alb.id
 }
