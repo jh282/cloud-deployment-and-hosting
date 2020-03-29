@@ -1,5 +1,5 @@
 locals {
-  # generate az list from region and zone id
+  # generate az list from region and zone ids
   az_list = [
     for az in var.availability_zones :
     "${var.region}${az}"

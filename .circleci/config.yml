@@ -20,20 +20,22 @@ workflows:
           requires:
             - terraform-validate
             - terraform-lint
-      - deplyoment-approval-req:
+      # Require manual approval to proceed with pipeline
+      - deplyoment-approval:
           type: approval
           requires:
             - terraform-plan
       - terraform-apply:
           requires:
-            - deplyoment-approval-req
-      - teardown-approval-req:
+            - deplyoment-approval
+      # Require manual approval to proceed with pipeline
+      - teardown-approval:
           type: approval
           requires:
             - terraform-apply
       - terraform-destroy:
           requires:
-            - teardown-approval-req
+            - teardown-approval
 
 jobs:
 
@@ -59,6 +61,7 @@ jobs:
       - checkout
       - run: terraform init << pipeline.parameters.tf_dir >>
       - run: terraform plan -out << pipeline.parameters.tf_plan >> << pipeline.parameters.tf_dir >>
+      # Store plan output for use in apply stage
       - persist_to_workspace:
           root: .
           paths:
