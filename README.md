@@ -2,7 +2,7 @@
 
 ## Solution
 
-This creates an AWS with EC2 backed ECS Cluster in a VPC spread across 3 availability zones in a single region. It pulls an image from ECR (which I stored my website build in) and serves on HTTP. Users currently access this site by hitting the public DNS of the ALB, which routes the traffic to ECS using dynamic port mapping.
+This creates an AWS with EC2 backed ECS Cluster in a VPC spread across 3 availability zones in a single region. It pulls an image from ECR (which I stored my website build in) and serves on HTTP. Access to the site is possible by hitting the public DNS of the ALB, which routes the traffic to ECS using dynamic port mapping.
 
 Metrics are exported from the ECS Service to cloudwatch, from which alarms can trigger autoscaling of the container capacity.
 
@@ -24,7 +24,6 @@ It runs the following build stages:
 
 The configuration can be found under .circleci/config.yaml
 
-
 ## Build Instructions
 
 This can be built either by using the Circle-CI pipeline, or by running terraform provision commands. In both cases the standard AWS environment variable credentials will need to be provided.
@@ -39,5 +38,15 @@ terraform init terraform/
 terraform apply terraform/
 ```
 
+The DNS that the site can be accessed from should be outputted at the end of the apply.
 
-## Further Work
+## Further Improvements
+
+Changes I would have liked to implement next to improve the solution given more time:
+
+- Create a hosted domain for the site, and enable a HTTPS listener on the ALB.
+- Add metric alarm driven auto-scaling to the EC2 ASG (currently just using fixed capacity values)
+- Add Network ACL security to the subnets, adding another layer of security on top of the security groups, limiting the possible flow of traffic to what I need.
+- Add testing to the build pipeline to ensure the service has come up and is accessible as expected.
+- Restructure the code into more meaningful modules, making them more segmented and  easier to manage going forward.
+- Export application logs from the containers to a centralised place, e.g. Cloudwatch. Allowing alerting to be implemented to identify any problems with the service.
