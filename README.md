@@ -50,3 +50,4 @@ Changes I would have liked to implement next to improve the solution given more 
 - Add testing to the build pipeline to ensure the service has come up and is accessible as expected.
 - Restructure the code into more meaningful modules, making them more segmented and  easier to manage going forward.
 - Export application logs from the containers to a centralised place, e.g. Cloudwatch. Allowing alerting to be implemented to identify any problems with the service.
+- Implement Terraform workspaces so that isolated infrastructure can be deployed for different environments or branches using the same code throughout. This allows for more testing earlier on in the development process, adding assurances that the code will work before moving it to the next stage.
