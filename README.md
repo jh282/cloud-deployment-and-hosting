@@ -12,9 +12,9 @@ The infrastructure is managed by Terraform and can be scaled up easily by alteri
 
 ## Automation
 
-The infrastructure can be checked, applied and destroyed using the Circle-CI based terraform build pipeline.
+The infrastructure can be checked, applied and destroyed using the Circle-CI based terraform build pipeline. Also implemented in the repo as part of the pull request checks to ensure code looks valid and plans successfully before merging.
 
-It runs the following build stages:
+It contains the following build stages:
 
 - Terraform validation
 - Terraform linting
